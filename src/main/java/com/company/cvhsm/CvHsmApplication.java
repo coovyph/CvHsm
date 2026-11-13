@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableConfigurationProperties(HsmProperties.class)
 @EnableScheduling
+//main app
 public class CvHsmApplication {
 
     public static void main(String[] args) {
