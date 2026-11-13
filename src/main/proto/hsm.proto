@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package com.company.cvhsm.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.company.cvhsm.grpc";
+option java_outer_classname = "HsmProto";
+
+service HsmService {
+    rpc GenerateKey(GenerateKeyRequest) returns (GenerateKeyResponse);
+    rpc ImportKey(ImportKeyRequest) returns (ImportKeyResponse);
+    rpc ExportKey(ExportKeyRequest) returns (ExportKeyResponse);
+    rpc TranslatePinFromTpkToZpk(TranslatePinFromTpkToZpkRequest) returns (TranslatePinFromTpkToZpkResponse);
+}
+
+message GenerateKeyRequest {
+  string mode = 1;
+  string key_type = 2;
+  string key_scheme_lmk = 3;
+  string zmk_tmk_flag = 4;
+  string zmk = 5;
+  string key_scheme_zmk = 6;
+  string key_usage = 7;
+  string algorithm = 8;
+  string mode_of_use = 9;
+  string key_version_number = 10;
+  string exportability = 11;
+}
+
+message GenerateKeyResponse {
+  string error_code = 1;
+  string key_under_lmk = 2;
+  string key_under_zmk = 3;
+  string key_check_value = 4;
+}
+
+message ImportKeyRequest {
+  string key_type = 1;
+  string zmk = 2;
+  string key_under_zmk = 3;
+  string key_scheme_lmk = 4;
+  string key_usage = 5;
+  string mode_of_use = 6;
+  string key_version_number = 7;
+  string exportability = 8;
+}
+
+message ImportKeyResponse {
+  string error_code = 1;
+  string key_under_lmk = 2;
+  string key_check_value = 3;
+}
+
+message ExportKeyRequest {
+  string key_type = 1;
+  string zmk_tmk_flag = 2;
+  string zmk_tmk = 3;
+  string key = 4;
+  string key_scheme_zmk_tmk = 5;
+}
+
+message ExportKeyResponse {
+  string error_code = 1;
+  string key_under_zmk_tmk = 2;
+  string key_check_value = 3;
+}
+
+message TranslatePinFromTpkToZpkRequest {
+  string source_tpk = 1;
+  string destination_zpk = 2;
+  string minimum_pin_length = 3;
+  string source_pin_block = 4;
+  string source_pin_block_format = 5;
+  string destination_pin_block_format = 6;
+  string pan_token = 7;
+}
+
+message TranslatePinFromTpkToZpkResponse {
+  string error_code = 1;
+  string pin_length = 2;
+  string destination_pin_block = 3;
+  string source_pin_block_format = 4;
+}
