@@ -6,16 +6,10 @@ import com.company.cvhsm.exception.HsmErrorCodeException;
 import com.company.cvhsm.hsm.HsmCommand;
 import com.company.cvhsm.hsm.HsmCommandFactory;
 import com.company.cvhsm.hsm.HsmCommandInvoker;
+
 import io.grpc.Status;
-import io.grpc.netty.shaded.io.netty.util.concurrent.CompleteFuture;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import com.company.cvhsm.grpc.ImportKeyRequest;
-import com.company.cvhsm.grpc.ImportKeyResponse;
-import com.company.cvhsm.grpc.ExportKeyRequest;
-import com.company.cvhsm.grpc.ExportKeyResponse;
-import com.company.cvhsm.grpc.TranslatePinFromTpkToZpkRequest;
-import com.company.cvhsm.grpc.TranslatePinFromTpkToZpkResponse;
 import lombok.extern.log4j.Log4j2;
 import net.devh.boot.grpc.server.service.GrpcService;
 
@@ -78,10 +72,27 @@ public class HsmGrpcService extends HsmServiceGrpc.HsmServiceImplBase {
 	}
 
 	@Override
-	public void translatePinFromTpkToZpk(TranslatePinFromTpkToZpkRequest request,
-			StreamObserver<TranslatePinFromTpkToZpkResponse> responseObserver) {
-		HsmCommand<TranslatePinFromTpkToZpkRequest, TranslatePinFromTpkToZpkResponse> command =
+	public void translatePinFromTpkToZpk(TranslatePinRequest request,
+			StreamObserver<TranslatePinResponse> responseObserver) {
+		HsmCommand<TranslatePinRequest, TranslatePinResponse> command =
 				hsmCommandFactory.getCommand("CA");
+		hsmCommandInvoker.invoke(request, command)
+		.thenAccept(response -> {
+			responseObserver.onNext(response);
+			responseObserver.onCompleted();
+		})
+		.exceptionally(throwable -> {
+			responseObserver.onError(toGrpcError(throwable));
+			return null;
+		});
+	}
+
+	@Override
+	public void translatePINFromZPK(TranslatePinRequest request,
+			StreamObserver<TranslatePinResponse> responseObserver) {
+		HsmCommand<TranslatePinRequest, TranslatePinResponse> command =
+				hsmCommandFactory.getCommand("CC");
+		
 		hsmCommandInvoker.invoke(request, command)
 		.thenAccept(response -> {
 			responseObserver.onNext(response);

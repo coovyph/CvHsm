@@ -8,8 +8,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
-import com.company.cvhsm.grpc.TranslatePinFromTpkToZpkRequest;
-import com.company.cvhsm.grpc.TranslatePinFromTpkToZpkResponse;
+import com.company.cvhsm.grpc.TranslatePinRequest;
+import com.company.cvhsm.grpc.TranslatePinResponse;
+
 
 class TranslatePINCACmdKeyblockTest {
 
@@ -31,7 +32,7 @@ class TranslatePINCACmdKeyblockTest {
         String destinationFormat = "02";
         String panToken = "123456789012";
 
-        TranslatePinFromTpkToZpkRequest request = TranslatePinFromTpkToZpkRequest.newBuilder()
+        TranslatePinRequest request = TranslatePinRequest.newBuilder()
                 .setSourceTpk(SOURCE_ZPK)
                 .setDestinationZpk(DEST_ZPK)
                 .setMinimumPinLength(minPinLength)
@@ -56,7 +57,7 @@ class TranslatePINCACmdKeyblockTest {
         String destinationFormat = "05";
         String panToken = "9876543210";
 
-        TranslatePinFromTpkToZpkRequest request = TranslatePinFromTpkToZpkRequest.newBuilder()
+        TranslatePinRequest request = TranslatePinRequest.newBuilder()
                 .setSourceTpk(SOURCE_ZPK)
                 .setDestinationZpk(DEST_ZPK)
                 .setMinimumPinLength(minPinLength)
@@ -75,7 +76,7 @@ class TranslatePINCACmdKeyblockTest {
 
     @Test
     void rejectsMinimumPinLengthBelowRange() {
-        TranslatePinFromTpkToZpkRequest request = TranslatePinFromTpkToZpkRequest.newBuilder()
+        TranslatePinRequest request = TranslatePinRequest.newBuilder()
                 .setSourceTpk(SOURCE_ZPK)
                 .setDestinationZpk(DEST_ZPK)
                 .setMinimumPinLength("03")
@@ -93,7 +94,7 @@ class TranslatePINCACmdKeyblockTest {
 
     @Test
     void rejectsMinimumPinLengthAboveRange() {
-        TranslatePinFromTpkToZpkRequest request = TranslatePinFromTpkToZpkRequest.newBuilder()
+        TranslatePinRequest request = TranslatePinRequest.newBuilder()
                 .setSourceTpk(SOURCE_ZPK)
                 .setDestinationZpk(DEST_ZPK)
                 .setMinimumPinLength("13")
@@ -111,7 +112,7 @@ class TranslatePINCACmdKeyblockTest {
 
     @Test
     void rejectsNonNumericMinimumPinLength() {
-        TranslatePinFromTpkToZpkRequest request = TranslatePinFromTpkToZpkRequest.newBuilder()
+        TranslatePinRequest request = TranslatePinRequest.newBuilder()
                 .setSourceTpk(SOURCE_ZPK)
                 .setDestinationZpk(DEST_ZPK)
                 .setMinimumPinLength("AB")
@@ -129,7 +130,7 @@ class TranslatePINCACmdKeyblockTest {
 
     @Test
     void rejectsInvalidSourcePinBlockLength() {
-        TranslatePinFromTpkToZpkRequest request = TranslatePinFromTpkToZpkRequest.newBuilder()
+        TranslatePinRequest request = TranslatePinRequest.newBuilder()
                 .setSourceTpk(SOURCE_ZPK)
                 .setDestinationZpk(DEST_ZPK)
                 .setMinimumPinLength("04")
@@ -149,7 +150,7 @@ class TranslatePINCACmdKeyblockTest {
    
     @Test
     void rejectsEmptyPanToken() {
-        TranslatePinFromTpkToZpkRequest request = TranslatePinFromTpkToZpkRequest.newBuilder()
+        TranslatePinRequest request = TranslatePinRequest.newBuilder()
                 .setSourceTpk(SOURCE_ZPK)
                 .setDestinationZpk(DEST_ZPK)
                 .setMinimumPinLength("04")
@@ -175,7 +176,7 @@ class TranslatePINCACmdKeyblockTest {
         String sourcePinBlockFormat = "01";
         byte[] body = (pinLength + destinationPinBlock + sourcePinBlockFormat).getBytes(StandardCharsets.US_ASCII);
 
-        TranslatePinFromTpkToZpkResponse response = command.unpackResponseBody("00","1", body);
+        TranslatePinResponse response = command.unpackResponseBody("00","1", body);
 
         assertEquals("00", response.getErrorCode());
         assertEquals(pinLength, response.getPinLength());
@@ -190,7 +191,7 @@ class TranslatePINCACmdKeyblockTest {
         String sourcePinBlockFormat = "47";
         byte[] body = (pinLength + destinationPinBlock + sourcePinBlockFormat).getBytes(StandardCharsets.US_ASCII);
 
-        TranslatePinFromTpkToZpkResponse response = command.unpackResponseBody("00","1", body);
+        TranslatePinResponse response = command.unpackResponseBody("00","1", body);
 
         assertEquals("00", response.getErrorCode());
         assertEquals(pinLength, response.getPinLength());
@@ -200,7 +201,7 @@ class TranslatePINCACmdKeyblockTest {
 
     @Test
     void returnsOnlyErrorCodeForEmptyBody() {
-        TranslatePinFromTpkToZpkResponse response = command.unpackResponseBody("10","1", new byte[0]);
+        TranslatePinResponse response = command.unpackResponseBody("10","1", new byte[0]);
 
         assertEquals("10", response.getErrorCode());
         assertEquals("", response.getPinLength());

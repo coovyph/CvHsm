@@ -10,7 +10,8 @@ service HsmService {
     rpc GenerateKey(GenerateKeyRequest) returns (GenerateKeyResponse);
     rpc ImportKey(ImportKeyRequest) returns (ImportKeyResponse);
     rpc ExportKey(ExportKeyRequest) returns (ExportKeyResponse);
-    rpc TranslatePinFromTpkToZpk(TranslatePinFromTpkToZpkRequest) returns (TranslatePinFromTpkToZpkResponse);
+    rpc TranslatePinFromTpkToZpk(TranslatePinRequest) returns (TranslatePinResponse);
+    rpc TranslatePINFromZPK(TranslatePinRequest) returns (TranslatePinResponse);
 }
 
 message GenerateKeyRequest {
@@ -65,7 +66,7 @@ message ExportKeyResponse {
   string key_check_value = 3;
 }
 
-message TranslatePinFromTpkToZpkRequest {
+message TranslatePinRequest {
   string source_tpk = 1;
   string destination_zpk = 2;
   string minimum_pin_length = 3;
@@ -75,7 +76,7 @@ message TranslatePinFromTpkToZpkRequest {
   string pan_token = 7;
 }
 
-message TranslatePinFromTpkToZpkResponse {
+message TranslatePinResponse {
   string error_code = 1;
   string pin_length = 2;
   string destination_pin_block = 3;

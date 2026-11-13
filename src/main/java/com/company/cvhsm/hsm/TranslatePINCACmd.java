@@ -6,11 +6,11 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.company.cvhsm.grpc.TranslatePinFromTpkToZpkRequest;
-import com.company.cvhsm.grpc.TranslatePinFromTpkToZpkResponse;
+import com.company.cvhsm.grpc.TranslatePinRequest;
+import com.company.cvhsm.grpc.TranslatePinResponse;
 
 @Component
-public class TranslatePINCACmd extends BaseHsmCommand<TranslatePinFromTpkToZpkRequest, TranslatePinFromTpkToZpkResponse>{
+public class TranslatePINCACmd extends BaseHsmCommand<TranslatePinRequest, TranslatePinResponse>{
 	private static final String COMMAND_CODE = "CA";
 	private static final String RESPONSE_CODE = "CB";
 	private static final int PIN_LENGTH_FIELD_SIZE = 2;
@@ -34,7 +34,7 @@ public class TranslatePINCACmd extends BaseHsmCommand<TranslatePinFromTpkToZpkRe
 	}
 
 	@Override
-	public byte[] packRequestBody(TranslatePinFromTpkToZpkRequest request) {
+	public byte[] packRequestBody(TranslatePinRequest request) {
 		validateRequest(request);
 		int totalLgth = 6; // pin length (2 char) + source pin format(2 char) + dest pin format(2 char)
 		if(this.variant) {
@@ -90,8 +90,9 @@ public class TranslatePINCACmd extends BaseHsmCommand<TranslatePinFromTpkToZpkRe
 
 	}
 
+	
 
-	private void validateRequest(TranslatePinFromTpkToZpkRequest request) {
+	private void validateRequest(TranslatePinRequest request) {
 
 		requireNonEmpty(request.getSourceTpk(), "source TPK");
 		validateKeyFormat(request.getSourceTpk(), "source TPK", this.variant);
@@ -114,9 +115,9 @@ public class TranslatePINCACmd extends BaseHsmCommand<TranslatePinFromTpkToZpkRe
 
 
 	@Override
-	public TranslatePinFromTpkToZpkResponse unpackResponseBody(String errorCode, Object cache, byte[] body) {
+	public TranslatePinResponse unpackResponseBody(String errorCode, Object cache, byte[] body) {
 		if (body.length == 0) {
-			return TranslatePinFromTpkToZpkResponse.newBuilder()
+			return TranslatePinResponse.newBuilder()
 					.setErrorCode(errorCode)
 					.build();
 		}
@@ -132,7 +133,7 @@ public class TranslatePINCACmd extends BaseHsmCommand<TranslatePinFromTpkToZpkRe
 		String sourcePinBlockFormat = response.substring(response.length() - PIN_BLOCK_FORMAT_FIELD_SIZE);
 		String destinationPinBlock = response.substring(PIN_LENGTH_FIELD_SIZE, response.length() - PIN_BLOCK_FORMAT_FIELD_SIZE);
 
-		return TranslatePinFromTpkToZpkResponse.newBuilder()
+		return TranslatePinResponse.newBuilder()
 				.setErrorCode(errorCode)
 				.setPinLength(pinLength)
 				.setDestinationPinBlock(destinationPinBlock)
