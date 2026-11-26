@@ -7,13 +7,19 @@ option java_package = "com.company.cvhsm.grpc";
 option java_outer_classname = "HsmProto";
 
 service HsmService {
+    rpc HsmStatus(HsmStatusRequest) returns (HsmStatusResponse);
     rpc GenerateKey(GenerateKeyRequest) returns (GenerateKeyResponse);
     rpc ImportKey(ImportKeyRequest) returns (ImportKeyResponse);
     rpc ExportKey(ExportKeyRequest) returns (ExportKeyResponse);
     rpc TranslatePinFromTpkToZpk(TranslatePinRequest) returns (TranslatePinResponse);
     rpc TranslatePINFromZPK(TranslatePinRequest) returns (TranslatePinResponse);
 }
-
+message HsmStatusRequest{
+}
+message HsmStatusResponse{
+  string error_code = 1;
+  string status_desc = 2;
+}
 message GenerateKeyRequest {
   string mode = 1;
   string key_type = 2;

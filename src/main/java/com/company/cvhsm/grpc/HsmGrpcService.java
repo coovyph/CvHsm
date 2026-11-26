@@ -92,7 +92,23 @@ public class HsmGrpcService extends HsmServiceGrpc.HsmServiceImplBase {
 			StreamObserver<TranslatePinResponse> responseObserver) {
 		HsmCommand<TranslatePinRequest, TranslatePinResponse> command =
 				hsmCommandFactory.getCommand("CC");
-		
+
+		hsmCommandInvoker.invoke(request, command)
+		.thenAccept(response -> {
+			responseObserver.onNext(response);
+			responseObserver.onCompleted();
+		})
+		.exceptionally(throwable -> {
+			responseObserver.onError(toGrpcError(throwable));
+			return null;
+		});
+	}
+
+	public void hsmStatus(com.company.cvhsm.grpc.HsmStatusRequest request,
+			io.grpc.stub.StreamObserver<com.company.cvhsm.grpc.HsmStatusResponse> responseObserver) {
+		HsmCommand<HsmStatusRequest, HsmStatusResponse> command =
+				hsmCommandFactory.getCommand("NO");
+
 		hsmCommandInvoker.invoke(request, command)
 		.thenAccept(response -> {
 			responseObserver.onNext(response);
