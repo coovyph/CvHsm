@@ -33,11 +33,12 @@ public abstract class GenerateKeyA0Command extends BaseHsmCommand<GenerateKeyReq
 		buff.put(request.getKeyType().getBytes(StandardCharsets.US_ASCII));
 		buff.put((byte)request.getKeySchemeLmk().charAt(0));
 
-		buff.put((byte)EXPORT_DELIMITER);
-		buff.put((byte)request.getZmkTmkFlag().charAt(0));
-		buff.put(request.getZmk().getBytes(StandardCharsets.US_ASCII));
-		buff.put((byte)request.getKeySchemeZmk().charAt(0));
-
+		if("1".equals(request.getMode())) {
+			buff.put((byte)EXPORT_DELIMITER);
+			buff.put((byte)request.getZmkTmkFlag().charAt(0));
+			buff.put(request.getZmk().getBytes(StandardCharsets.US_ASCII));
+			buff.put((byte)request.getKeySchemeZmk().charAt(0));
+		}
 		//need to write exportability option
 		constructAdditionalRequest(request,buff);
 
@@ -46,10 +47,10 @@ public abstract class GenerateKeyA0Command extends BaseHsmCommand<GenerateKeyReq
 		buff.flip();
 		buff.get(rslt);
 
-		
+
 		return rslt;
 	}
-	
+
 	@Override
 	public GenerateKeyResponse unpackResponseBody(String errorCode, Object cache, byte[] body) {
 		if (body.length == 0) {
@@ -74,6 +75,7 @@ public abstract class GenerateKeyA0Command extends BaseHsmCommand<GenerateKeyReq
 		String keyUnderLmk = response.substring(offset,lastOffset);	
 		offset=lastOffset;
 
+
 		String keyUnderZmk = null;
 		boolean hasKeyUnderZmk = (cache instanceof String mode && ("1".equals(mode) || "B".equals(mode)));
 
@@ -84,22 +86,27 @@ public abstract class GenerateKeyA0Command extends BaseHsmCommand<GenerateKeyReq
 			if(keyUnderZmkLength == 16 && response.charAt(offset) != 'Z') {
 				lastOffset --;
 			}
-			
+
 			keyUnderZmk = response.substring(offset,lastOffset);
 			offset = lastOffset;
 		}
 
+
+
 		String keyCheckValue = response.substring(offset,offset+KCV_LENGTH);
 
-		return GenerateKeyResponse.newBuilder().
+		GenerateKeyResponse.Builder builder = GenerateKeyResponse.newBuilder().
 				setErrorCode(errorCode).
 				setKeyUnderLmk(keyUnderLmk).
-				setKeyUnderZmk(keyUnderZmk).
-				setKeyCheckValue(keyCheckValue).
-				build();
+				setKeyCheckValue(keyCheckValue);
+
+		if(keyUnderZmk!=null) {
+			builder = builder.setKeyUnderZmk(keyUnderZmk);
+		}
+		return builder.build();
 
 	}
-	
+
 	protected abstract int calculateRespKeyLength(String response);
 
 	protected abstract ByteBuffer prepareBuffer();
@@ -114,7 +121,9 @@ public abstract class GenerateKeyA0Command extends BaseHsmCommand<GenerateKeyReq
 		valuesIn(request.getMode(),"mode", false, "0","1");
 		validateKeyType(request.getKeyType());
 		validateKeySchemeLmk(request.getKeySchemeLmk());
-		valuesIn(request.getZmkTmkFlag(), "zmk/tmk flag",false, "0", "1");
+		if("1".equals(request.getMode())) {
+			valuesIn(request.getZmkTmkFlag(), "zmk/tmk flag",false, "0", "1");
+		}
 		validateMoreFields(request);
 	}
 
