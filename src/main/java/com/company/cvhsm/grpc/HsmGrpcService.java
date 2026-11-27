@@ -39,6 +39,21 @@ public class HsmGrpcService extends HsmServiceGrpc.HsmServiceImplBase {
 	}
 
 	@Override
+	public void generateKcv(com.company.cvhsm.grpc.GenKcvRequest request,
+			io.grpc.stub.StreamObserver<com.company.cvhsm.grpc.GenKcvResponse> responseObserver) {
+		HsmCommand<GenKcvRequest, GenKcvResponse> command = hsmCommandFactory.getCommand("BU");
+		hsmCommandInvoker.invoke(request, command)
+		.thenAccept(response -> {
+			responseObserver.onNext(response);
+			responseObserver.onCompleted();
+		})
+		.exceptionally(throwable -> {
+			responseObserver.onError(toGrpcError(throwable));
+			return null;
+		});
+	}
+
+	@Override
 	public void importKey(ImportKeyRequest request, StreamObserver<ImportKeyResponse> responseObserver) {
 		HsmCommand<ImportKeyRequest, ImportKeyResponse> command = hsmCommandFactory.getCommand("A6");
 		hsmCommandInvoker.invoke(request, command)
