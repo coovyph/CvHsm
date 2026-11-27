@@ -14,6 +14,23 @@ service HsmService {
     rpc ExportKey(ExportKeyRequest) returns (ExportKeyResponse);
     rpc TranslatePinFromTpkToZpk(TranslatePinRequest) returns (TranslatePinResponse);
     rpc TranslatePINFromZPK(TranslatePinRequest) returns (TranslatePinResponse);
+    rpc GenerateMAC(MacGenRequest) returns (MacGenResponse);
+}
+
+message MacGenRequest{
+  int32 mode_flag = 1;
+  int32 input_format = 2;
+  int32 mac_size = 3;
+  int32 mac_algo = 4;
+  int32 pad_method = 5;
+  string key_type = 6;
+  string key = 7;
+  string message = 8;
+}
+
+message MacGenResponse{
+  string error_code = 1;
+  string mac = 2;
 }
 
 message GenKcvRequest{

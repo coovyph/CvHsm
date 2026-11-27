@@ -54,6 +54,26 @@ public class HsmGrpcService extends HsmServiceGrpc.HsmServiceImplBase {
 	}
 
 	@Override
+	public void generateMAC(com.company.cvhsm.grpc.MacGenRequest request,
+			io.grpc.stub.StreamObserver<com.company.cvhsm.grpc.MacGenResponse> responseObserver) {
+
+		process(request, responseObserver, "M6");
+	}
+	
+	private <Rq,Rs> void process( Rq req, io.grpc.stub.StreamObserver<Rs> responseObserver,String commandCode) {
+		HsmCommand<Rq, Rs> command = hsmCommandFactory.getCommand(commandCode);
+		hsmCommandInvoker.invoke(req, command)
+		.thenAccept(response -> {
+			responseObserver.onNext(response);
+			responseObserver.onCompleted();
+		})
+		.exceptionally(throwable -> {
+			responseObserver.onError(toGrpcError(throwable));
+			return null;
+		});
+	}
+
+	@Override
 	public void importKey(ImportKeyRequest request, StreamObserver<ImportKeyResponse> responseObserver) {
 		HsmCommand<ImportKeyRequest, ImportKeyResponse> command = hsmCommandFactory.getCommand("A6");
 		hsmCommandInvoker.invoke(request, command)
